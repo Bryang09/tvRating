@@ -25,29 +25,49 @@
       }
       .stars-inner {
         position: absolute;
-        top: 0;
-        left: 0;
+        top: 12px;
         white-space: nowrap;
         overflow: hidden;
         width: 0;
       }
 
       .stars-outer::before {
-        content: "\f005\f005\f005\f005\f005";
-        font-family: "Font Awsome 5 Free";
+        content: "\f005 \f005 \f005 \f005 \f005";
+        font-family: "Font Awesome 5 Free";
         font-weight: 900;
         color: #ccc;
       }
       .stars-inner::before {
         content: "\f005\f005\f005\f005\f005";
-        font-family: "Font Awsome 5 Free";
+        font-family: "Font Awesome 5 Free";
         font-weight: 900;
         color: #f8ce0b;
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="container mt-5">
+      <div class="from-group">
+        <select id="product-select" class="form-control custom-select">
+          <option value="0" disabled selected>Select Product</option>
+          <option value="sony">Sony 4K TV</option>
+          <option value="samsung">Samsung 4K TV</option>
+          <option value="vizio">Vizio 4K TV</option>
+          <option value="panasonic">Panasonic 4K TV</option>
+          <option value="phillips">Phillips 4K TV</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input
+          type="number"
+          id="rating-control"
+          class="form-control"
+          step="0.1"
+          max="5"
+          placeholder="Rate 1 - 5"
+          disabled
+        />
+      </div>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -56,6 +76,13 @@
           </tr>
         </thead>
         <tbody>
+          <tr class="sony">
+            <td>Sony 4k TV</td>
+            <td class="stars-outer">
+              <div class="stars-inner"></div>
+              <span class="number-rating"> </span>
+            </td>
+          </tr>
           <tr class="samsung">
             <td>Samsung 4k TV</td>
             <td class="stars-outer">
@@ -102,12 +129,43 @@
       const starsTotal = 5;
       // RUN GET RATINGS ON LOAD
       window.addEventListener("DOMContentLoaded", getRatings);
+
+      // FORM ELEMENTS
+      const productSelect = document.querySelector("#product-select");
+      const ratingControl = document.querySelector("#rating-control");
+      // INIT PRODUCT
+      let product;
+
+      // PRODUCT SELECT CHANGE
+      productSelect.addEventListener("change", e => {
+        product = event.target.value;
+        // ENABLE RATING CONTROL
+        ratingControl.disabled = false;
+        ratingControl.value = ratings[product];
+      });
+
+      // RATING CONTROL CHANGE
+      ratingControl.addEventListener("blur", e => {
+        const rating = e.target.value;
+
+        // MAKE SURE ITS 5 OR UNDER
+        if (rating > 5) {
+          alert("Please Rate 1 -5 ");
+          return;
+        }
+
+        // CHANGE RATING
+        ratings[product] = rating;
+
+        getRatings();
+      });
+
       // GET RATINGS
       function getRatings() {
         for (let rating in ratings) {
           // GET PERCENTAGE
           const starPercentage = (ratings[rating] / starsTotal) * 100;
-          console.log(starPercentage);
+          console.log(rating);
 
           // ROUND TO NEAREST TEN
           const starPercentageRounded = `${Math.round(starPercentage / 10) *
@@ -115,10 +173,13 @@
           console.log(starPercentageRounded);
 
           // SET WIDTH OF STARS INNER TO PERCENTAGE
-
           document.querySelector(
-            `.${rating} .stars-inner`
+            `.${rating} .stars-inner `
           ).style.width = starPercentageRounded;
+
+          // ADD NUMBER RATING
+          document.querySelector(`.${rating} .number-rating `).innerHTML =
+            ratings[rating];
         }
       }
     </script>
